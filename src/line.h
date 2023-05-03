@@ -54,6 +54,8 @@ class Line2 : public Object {
 
   ~Line2() override;
 
+  float distance() const;
+
   /**
    * \brief Set the shaft length and head length of the arrow
    */

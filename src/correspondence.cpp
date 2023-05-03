@@ -42,6 +42,10 @@ PointCloudCorrespondenceDisplay::PointCloudCorrespondenceDisplay() {
       new ColorProperty("Line End Color", QColor(0x66, 0xcc, 0xff),
                         "Color of the end of the line, if gradient is enabled", this, SLOT(updateStyle()), this);
   end_color_property_->hide();
+  max_length_property_ = new FloatProperty("Max Line Length", 1.0,
+                                           "The maximum length of a line to display. "
+                                           "Use this to supress weak correspondence and show only strong ones.",
+                                           this, SLOT(updateMaxLength()), this);
 }
 
 PointCloudCorrespondenceDisplay::~PointCloudCorrespondenceDisplay() {
@@ -64,7 +68,6 @@ void PointCloudCorrespondenceDisplay::reset() {
 }
 
 void PointCloudCorrespondenceDisplay::allocateLines(size_t size) {
-  ROS_ERROR("size: %d", int(size));
   if (line_buffer_.size() < size) {
     size_t old_size = line_buffer_.size();
     line_buffer_.resize(size);
@@ -76,6 +79,16 @@ void PointCloudCorrespondenceDisplay::allocateLines(size_t size) {
       delete line_buffer_[i];
     }
     line_buffer_.resize(size);
+  }
+}
+
+void PointCloudCorrespondenceDisplay::updateMaxLength() {
+  float max_length = max_length_property_->getFloat();
+  for (auto&& ptr : line_buffer_) {
+    ptr->setVisible(true);
+    if (ptr->distance() > max_length) {
+      ptr->setVisible(false);
+    }
   }
 }
 
@@ -98,6 +111,7 @@ void PointCloudCorrespondenceDisplay::updateStyle() {
       ptr->setColor2(ogre_color_e);
     }
   }
+  updateMaxLength();
 }
 
 void PointCloudCorrespondenceDisplay::processMessage(
@@ -132,14 +146,11 @@ void PointCloudCorrespondenceDisplay::processMessage(
   auto points_e = transform_pointcloud(msg->cloud_source, transform_e, msg->index_source);
 
   allocateLines(points_s.size());
-  ROS_ERROR("1");
 
   for (size_t i = 0; i < points_s.size(); ++i) {
     line_buffer_[i]->setPoint(points_s[i], points_e[i]);
   }
-  ROS_ERROR("2");
   updateStyle();
-  ROS_ERROR("3");
 }
 
 int32_t findChannelIndex(const sensor_msgs::PointCloud2& cloud, const std::string& channel) {

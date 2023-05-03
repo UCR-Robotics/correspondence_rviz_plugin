@@ -62,8 +62,9 @@ class PointCloudCorrespondenceDisplay : public MessageFilterDisplay<corresponden
 
 private Q_SLOTS:
   void updateStyle();
+  void updateMaxLength();
 
-protected:
+ protected:
   /** @brief Do initialization. Overridden from MessageFilterDisplay. */
   void onInitialize() override;
 
@@ -76,6 +77,7 @@ private:
   ColorProperty* end_color_property_;
   BoolProperty* gradient_color_enabled_property_;
   FloatProperty* alpha_property_;
+  FloatProperty* max_length_property_;
 
   std::vector<rviz::Line2*> line_buffer_;
 };

@@ -129,4 +129,6 @@ const Ogre::Quaternion& Line2::getOrientation() { return scene_node_->getOrienta
 
 void Line2::setUserData(const Ogre::Any& data) { manual_object_->getUserObjectBindings().setUserAny(data); }
 
+float Line2::distance() const { return start_.distance(end_); }
+
 }  // namespace rviz

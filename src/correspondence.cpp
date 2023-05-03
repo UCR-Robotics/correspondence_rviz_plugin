@@ -38,14 +38,24 @@ PointCloudCorrespondenceDisplay::PointCloudCorrespondenceDisplay() {
   alpha_property_->setMax(1);
   gradient_color_enabled_property_ = new BoolProperty(
       "Gradient Color", false, "Enable gradient color from start to end", this, SLOT(updateStyle()), this);
-  end_color_property_ =
-      new ColorProperty("Line End Color", QColor(0x66, 0xcc, 0xff),
-                        "Color of the end of the line, if gradient is enabled", this, SLOT(updateStyle()), this);
+  end_color_property_ = new ColorProperty("Line End Color", QColor(0x66, 0xcc, 0xff),
+                                          "Color of the end of the line, if gradient is enabled",
+                                          gradient_color_enabled_property_, SLOT(updateStyle()), this);
   end_color_property_->hide();
+
+  max_length_enable_property_ =
+      new BoolProperty("Max Length", false, "Enable maximum line length limit", this, SLOT(updateLengthLimit()), this);
   max_length_property_ = new FloatProperty("Max Line Length", 1.0,
                                            "The maximum length of a line to display. "
                                            "Use this to supress weak correspondence and show only strong ones.",
-                                           this, SLOT(updateMaxLength()), this);
+                                           max_length_enable_property_, SLOT(updateLengthLimit()), this);
+
+  min_length_enable_property_ =
+      new BoolProperty("Min Length", false, "Enable minimum line length limit", this, SLOT(updateLengthLimit()), this);
+  min_length_property_ = new FloatProperty("Min Line Length", 0.0,
+                                           "The minimum length of a line to display. "
+                                           "Use this to supress weak correspondence and show only strong ones.",
+                                           min_length_enable_property_, SLOT(updateLengthLimit()), this);
 }
 
 PointCloudCorrespondenceDisplay::~PointCloudCorrespondenceDisplay() {
@@ -82,11 +92,18 @@ void PointCloudCorrespondenceDisplay::allocateLines(size_t size) {
   }
 }
 
-void PointCloudCorrespondenceDisplay::updateMaxLength() {
+void PointCloudCorrespondenceDisplay::updateLengthLimit() {
+  bool max_length_enable = max_length_enable_property_->getBool();
+  bool min_length_enable = min_length_enable_property_->getBool();
   float max_length = max_length_property_->getFloat();
+  float min_length = min_length_property_->getFloat();
   for (auto&& ptr : line_buffer_) {
     ptr->setVisible(true);
-    if (ptr->distance() > max_length) {
+    float distance = ptr->distance();
+    if (max_length_enable && distance > max_length) {
+      ptr->setVisible(false);
+    }
+    if (min_length_enable && distance < min_length) {
       ptr->setVisible(false);
     }
   }
@@ -111,7 +128,7 @@ void PointCloudCorrespondenceDisplay::updateStyle() {
       ptr->setColor2(ogre_color_e);
     }
   }
-  updateMaxLength();
+  updateLengthLimit();
 }
 
 void PointCloudCorrespondenceDisplay::processMessage(

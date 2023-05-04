@@ -77,9 +77,7 @@ private:
   ColorProperty* end_color_property_;
   BoolProperty* gradient_color_enabled_property_;
   FloatProperty* alpha_property_;
-  BoolProperty* max_length_enable_property_;
   FloatProperty* max_length_property_;
-  BoolProperty* min_length_enable_property_;
   FloatProperty* min_length_property_;
 
   std::vector<rviz::Line2*> line_buffer_;

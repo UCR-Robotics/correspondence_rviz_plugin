@@ -47,7 +47,7 @@ Line2::Line2(Ogre::SceneManager* manager, Ogre::SceneNode* parent_node) : Object
 
   static int count = 0;
   std::stringstream ss;
-  ss << "LineMaterial" << count++;
+  ss << "Line2Material" << count++;
 
   // NOTE: The second parameter to the create method is the resource group the material will be added to.
   // If the group you name does not exist (in your resources.cfg file) the library will assert() and your
@@ -56,7 +56,9 @@ Line2::Line2(Ogre::SceneManager* manager, Ogre::SceneNode* parent_node) : Object
       Ogre::MaterialManager::getSingleton().create(ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   manual_object_material_->setReceiveShadows(false);
   manual_object_material_->getTechnique(0)->setLightingEnabled(true);
-  manual_object_material_->getTechnique(0)->getPass(0)->setVertexColourTracking(Ogre::TVC_AMBIENT | Ogre::TVC_DIFFUSE | Ogre::TVC_SPECULAR | Ogre::TVC_EMISSIVE);
+  manual_object_material_->getTechnique(0)->getPass(0)->setDiffuse(0, 0, 0, 0);
+  manual_object_material_->getTechnique(0)->getPass(0)->setAmbient(1, 1, 1);
+  manual_object_material_->getTechnique(0)->getPass(0)->setVertexColourTracking(Ogre::TVC_EMISSIVE);
 
   scene_node_->attachObject(manual_object_);
 

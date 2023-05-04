@@ -48,12 +48,14 @@ PointCloudCorrespondenceDisplay::PointCloudCorrespondenceDisplay() {
                         "The maximum length of a line to display. "
                         "Use this to supress weak correspondence and show only strong ones. Set to 0 to disable.",
                         this, SLOT(updateLengthLimit()), this);
+  max_length_property_->setMin(0);
 
   min_length_property_ =
       new FloatProperty("Min Line Length", 0.0,
                         "The minimum length of a line to display. "
                         "Use this to supress strong correspondence and show only week ones. Set to 0 to disable.",
                         this, SLOT(updateLengthLimit()), this);
+  min_length_property_->setMin(0);
 }
 
 PointCloudCorrespondenceDisplay::~PointCloudCorrespondenceDisplay() {
@@ -93,8 +95,8 @@ void PointCloudCorrespondenceDisplay::allocateLines(size_t size) {
 void PointCloudCorrespondenceDisplay::updateLengthLimit() {
   float max_length = max_length_property_->getFloat();
   float min_length = min_length_property_->getFloat();
-  bool max_length_enable = (max_length == 0.0);
-  bool min_length_enable = (min_length == 0.0);
+  bool max_length_enable = (max_length != 0.0);
+  bool min_length_enable = (min_length != 0.0);
   for (auto&& ptr : line_buffer_) {
     ptr->setVisible(true);
     float distance = ptr->distance();
